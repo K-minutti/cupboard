@@ -1,15 +1,45 @@
 package main
 
 import (
-    "fmt"
-    "flag"
+	"fmt"
+    "time"
+    "math/rand"
+	"syscall"
 )
 
+var data = []string{
+    "The only thing we have to fear is fear itself",
+    "Ask not what your country can do for you; ask what you can do for your country",
+    "Tis better to have loved and lost than never to have loved at all",
+}
+
+
 func main() {
-    var input string
-    flag.StringVar(&input, "i", "", "input name")
-    flag.Parse()
+    fmt.Println("Starting program...")
+
+    rand.Seed(time.Now().UnixNano())
+    randIdx := rand.Intn(len(data))
+
+    text := data[randIdx]
+
+    fmt.Println(text)
     
-    output := fmt.Sprintf("Hello %s :)", input)
-    fmt.Println(output)
+    for {
+        key, err := readKeyStroke()
+        if err != nil {
+            fmt.Println("Error reading keystroke:", err)
+            return
+        }
+        fmt.Printf("%c", key)
+    }
+}
+
+func readKeyStroke() (byte, error) {
+    var buf [1]byte
+    _, err := syscall.Read(syscall.Stdin, buf[:])
+    if err != nil {
+        return 0, err
+    }
+    return buf[0], nil
+
 }
